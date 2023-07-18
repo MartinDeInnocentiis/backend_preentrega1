@@ -1,5 +1,4 @@
 import utils from "../utils.js";
-import crypto from "crypto";
 
 export class ProductManager {
   constructor(path) {
@@ -62,47 +61,46 @@ export class ProductManager {
     }
   }
 
-
   async getProductById(id) {
     try {
-      let data = await utils.readFile(this.path);
-      this.products = data?.length > 0 ? data : [];
-      let product = this.products.find((dato) => dato.id === id);
+        let data = await utils.readFile(this.path);
+        this.products = data?.length > 0 ? data : [];
+        let product = this.products.find((dato) => dato.id === id);
 
-      if (product !== undefined) {
-        return product;
-      } else {
-        return "ERROR: Product is not found.";
-      }
+        if (product !== undefined) {
+            return product;
+        } else {
+            return "ERROR: Product is not found.";
+        }
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
-  }
-
+}
 
   async updateProductById(id, data) {
     try {
-      let products = await utils.readFile(this.path);
-      this.products = products?.length > 0 ? products : [];
+        let products = await utils.readFile(this.path);
+        this.products = products?.length > 0 ? products : [];
 
-      let productIndex = this.products.findIndex((dato) => dato.id === id);
-      if (productIndex !== -1) {
-        this.products[productIndex] = {
-          ...this.products[productIndex],
-          ...data,
-        };
-        await utils.writeFile(this.path, products);
-        return {
-          mensaje: "Product updated successfully.",
-          producto: this.products[productIndex],
-        };
-      } else {
-        return { mensaje: "ERROR: Product is not found." };
-      }
+        let productIndex = this.products.findIndex((dato) => dato.id === id);
+        if (productIndex !== -1) {
+            this.products[productIndex] = {
+                ...this.products[productIndex],
+                ...data,
+            };
+            await utils.writeFile(this.path, this.products); 
+            return {
+                mensaje: "Product updated successfully.", 
+                producto: this.products[productIndex],
+            };
+        } else {
+            return { mensaje: "ERROR: Product is not found." };
+        }
     } catch (error) {
-      console.log(error);
+        console.log(error);
+        return { mensaje: "ERROR: Unable to update the product." }; 
     }
-  }
+}
 
 
   async deleteProductById(id) {

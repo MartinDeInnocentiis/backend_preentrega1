@@ -41,6 +41,7 @@ router.get("/:pid", async (req, res) => {
     }
 });
 
+
 router.post("/", async (req, res) => {
     const { title, description, code, price, status, stock, category, thumbnail } = req.body;
     const product = {};
@@ -68,34 +69,36 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put(":/pid", async (req, res) => {
+router.put("/:pid", async (req, res) => {
     const { pid } = req.params;
-    const { title, description, code, price, status, stock, category, thumbnail } = req.body;
+    const { title, description, code, price, stock, category, thumbnail } = req.body;
     const productTemp = {};
-    let product = await prodMngr.getProductById(parseInt(pid));
-    if (product) {
 
-        if (!title, !description, !code, !price, !status, !stock, !category, !thumbnail) {
-            res.json({ message: "Complete all fields" });
+    const requiredFields = [title, description, code, price, stock, category, thumbnail];
+
+    if (requiredFields.every((field) => field !== undefined && field !== '')) {
+        let product = await prodMngr.getProductById(parseInt(pid));
+        if (product) {
+            productTemp.title = title;
+            productTemp.description = description;
+            productTemp.code = code;
+            productTemp.price = price;
+            productTemp.stock = stock;
+            productTemp.category = category;
+            productTemp.thumbnail = thumbnail;
+
+            let result = await prodMngr.updateProductById(parseInt(pid), productTemp);
+            res.json({ message: "Product Updated.", data: result });
+        } else {
+            res.json({
+                message: "ERROR: Can't update the product. Not found.",
+            });
         }
-
-        productTemp.title = title;
-        productTemp.description = description;
-        productTemp.code = code;
-        productTemp.price = price;
-        productTemp.status = status;
-        productTemp.stock = stock;
-        productTemp.category = category;
-        productTemp.thumbnail = thumbnail;
-
-        let result = await prodMngr.updateProductById(parseInt(pid), productTemp);
-        res.json({ message: "Product Updated.", data: result });
     } else {
-        res.json({
-            message: "ERROR: Can´t update the product. Not found.",
-        });
+        res.status(400).json({ message: "Complete all fields" });
     }
 });
+
 
 router.delete("/:pid", async (req, res) => {
     const { pid } = req.params;
